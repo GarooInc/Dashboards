@@ -1,0 +1,121 @@
+import { Bar, BarChart, XAxis, YAxis, Cell } from "recharts"
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import type { ChartConfig } from "@/components/ui/chart"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart"
+
+interface ChartBarMixedProps {
+  title?: string;
+  description?: string;
+  chartData?: Array<{
+    category: string;
+    value: number;
+    fill?: string;
+  }>;
+  valueLabel?: string;
+}
+
+const CHART_COLORS = [
+  "hsl(0, 72%, 51%)",     // Rojo vibrante (primary)
+  "hsl(0, 84%, 60%)",     // Rojo coral (destructive)
+  "hsl(350, 75%, 55%)",   // Rojo rosado
+  "hsl(10, 80%, 58%)",    // Rojo anaranjado
+  "hsl(340, 70%, 50%)",   // Rojo frambuesa
+];
+
+export function ChartBarMixed({ 
+  title = "Chart", 
+  description, 
+  chartData = [],
+  valueLabel = "Value"
+}: ChartBarMixedProps) {
+  
+  if (!chartData || chartData.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-black">{title}</CardTitle>
+          {description && <CardDescription>{description}</CardDescription>}
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+            No hay datos disponibles
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const chartConfig: ChartConfig = {
+    value: {
+      label: valueLabel,
+    },
+    ...chartData.reduce((acc, item, index) => {
+      acc[item.category] = {
+        label: item.category,
+        color: CHART_COLORS[index % 5],
+      };
+      return acc;
+    }, {} as ChartConfig)
+  };
+
+  const formattedData = chartData.map((item, index) => ({
+    category: item.category,
+    value: item.value,
+    fill: CHART_COLORS[index % 5],
+  }));
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-black">{title}</CardTitle>
+        {description && <CardDescription>{description}</CardDescription>}
+      </CardHeader>
+      <CardContent className="">
+        <ChartContainer config={chartConfig}>
+          <BarChart
+            accessibilityLayer
+            data={formattedData}
+            layout="vertical"
+          >
+            <YAxis
+              dataKey="category"
+              type="category"
+              tickLine={false}
+              axisLine={false}
+              width={100}
+              tick={{ fontSize: 12 }}
+            />
+            <XAxis dataKey="value" type="number"  />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Bar 
+              dataKey="value" 
+              layout="vertical" 
+              radius={3}
+              barSize={40}
+            >
+              {formattedData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default ChartBarMixed;
