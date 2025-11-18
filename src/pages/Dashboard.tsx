@@ -47,6 +47,7 @@ function Dashboard (){
         });
 
         getTopKeywords().then(data => {
+            console.log(data);
            const keywords = data.top_keywords.map((item: { keyword: string; count: number }) => ({
                 category: item.keyword,
                 value: item.count
@@ -59,26 +60,27 @@ function Dashboard (){
 
 
     return (
-        <div className="bg-white min-h-screen md:h-screen md:overflow-hidden flex flex-col">
+        <div className="bg-white min-h-screen flex flex-col">
             <Header title= "Dashboard" />
-            <div className="flex-1 flex flex-col md:px-20 md:py-6 gap-12 md:overflow-hidden p-10">
-                <div className="grid md:grid-cols-5 grid-cols-2 gap-4 md:h-24">
+            <div className="flex-1 flex flex-col md:px-20 md:py-6 gap-4  p-10">
+                <div className="grid md:grid-cols-5 grid-cols-2 gap-4 ">
                     <Kpi title="Conversaciones" value={conversionRate.totalChatHistories} />
                     <Kpi title="Citas" value={conversionRate.totalAppointments} />
                     <div></div>
                     <Kpi title="Tiempo de Respuesta (s)" value={""} />
                     <Kpi title="% Conversión de citas" value={conversionRate.conversionRate} />
                 </div>
-                <div className="grid md:grid-cols-3  gap-4 md:h-[calc(40%-1rem)]">
+                <div className="grid md:grid-cols-3  gap-4 ">
                     <BarChartHorizontal title="Distribución de Sentimientos" chartData={sentimentDistribution} />
                     <div></div>
+                    {/* <BarChartHorizontal title="Conversaciones por Keywords" chartData={topKeywords} /> */}
                     <BarChartVertical title="Conversaciones por Canal" chartData={userChannels}/>
 
                 </div>
-                <div className="md:grid md:grid-cols-2 gap-4 md:h-[calc(40%-1rem)]">
+                <div className="md:grid md:grid-cols-2 gap-4 items-start">
+                    {/* <BarChartHorizontal title="Conversaciones por Keywords" chartData={topKeywords} /> */}
                     <div></div>
                     <BarChartHorizontal title="Conversaciones por Keywords" chartData={topKeywords} />
-
                 </div>
             </div>
         </div>
