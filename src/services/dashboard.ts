@@ -76,30 +76,6 @@ export const getAllUsers = async () => {
   }
 };
 
-/**
- * Listar canales de usuarios
- */
-export const getUserChannels = async () => {
-  try {
-    const response = await fetch(`${VITE_API_SPECTRUM_URL}/users/channels`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': import.meta.env.VITE_API_KEY
-
-      },
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status} ${response.statusText}`);
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error('Error al obtener canales de usuarios:', error);
-    throw error;
-  }
-};
 
 // ============================================
 // CHAT HISTORIES
@@ -309,3 +285,30 @@ export const getGeneralAnalysis = async () => {
     throw error;
   }
 };
+
+
+/**
+ * Análisis general de usuarios
+ */
+export const getAnalysisChannels = async () => {
+  try {
+    const response = await fetch(`${VITE_API_SPECTRUM_URL}/analysis/channels`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': import.meta.env.VITE_API_KEY
+
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error al obtener análisis general:', error);
+    throw error;
+  }
+};
+

@@ -12,7 +12,7 @@ const Kpi = ({ title, value }: KpiProps) => {
                 <CardTitle className="text-xs md:text-sm text-gray-500">{title}</CardTitle>
             </CardHeader>
             <CardContent className="m-0">
-                <div className="text-2xl font-bold text-black">{value}</div>
+                <div className="text-xl font-bold text-black">{value}</div>
              </CardContent>
         </Card>
     );

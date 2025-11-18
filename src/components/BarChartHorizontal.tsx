@@ -23,6 +23,7 @@ interface ChartBarMixedProps {
     fill?: string;
   }>;
   valueLabel?: string;
+  maxHeight?: number | string;
 }
 
 const CHART_COLORS = [
@@ -33,21 +34,21 @@ const CHART_COLORS = [
   "hsl(340, 70%, 50%)",   // Rojo frambuesa
 ];
 
-export function ChartBarMixed({ 
+const BarChartHorizontal = function ({
   title = "Chart", 
   description, 
   chartData = [],
-  valueLabel = "Value"
+  valueLabel = "Value",
 }: ChartBarMixedProps) {
   
   if (!chartData || chartData.length === 0) {
     return (
-      <Card>
+      <Card className="flex flex-col max-h-20 h-20">
         <CardHeader>
           <CardTitle className="text-black">{title}</CardTitle>
           {description && <CardDescription>{description}</CardDescription>}
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex-1 ">
           <div className="flex items-center justify-center h-[200px] text-muted-foreground">
             No hay datos disponibles
           </div>
@@ -76,17 +77,21 @@ export function ChartBarMixed({
   }));
 
   return (
-    <Card>
+    <Card className="flex flex-col">
       <CardHeader>
         <CardTitle className="text-black">{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
-      <CardContent className="">
-        <ChartContainer config={chartConfig}>
+      <CardContent className="flex-1">
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-auto h-full"
+        >
           <BarChart
             accessibilityLayer
             data={formattedData}
             layout="vertical"
+            className="h-full"
           >
             <YAxis
               dataKey="category"
@@ -95,8 +100,9 @@ export function ChartBarMixed({
               axisLine={false}
               width={100}
               tick={{ fontSize: 12 }}
+              className="uppercase"
             />
-            <XAxis dataKey="value" type="number"  />
+            <XAxis dataKey="value" type="number" />
             <ChartTooltip
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
@@ -105,7 +111,7 @@ export function ChartBarMixed({
               dataKey="value" 
               layout="vertical" 
               radius={3}
-              barSize={40}
+              className="h-full"
             >
               {formattedData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={entry.fill} />
@@ -118,4 +124,4 @@ export function ChartBarMixed({
   )
 }
 
-export default ChartBarMixed;
+export default BarChartHorizontal;
