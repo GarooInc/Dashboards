@@ -43,13 +43,13 @@ const BarChartHorizontal = function ({
   
   if (!chartData || chartData.length === 0) {
     return (
-      <Card className="flex flex-col max-h-20 h-20">
+      <Card className="flex flex-col">
         <CardHeader>
           <CardTitle className="text-black">{title}</CardTitle>
           {description && <CardDescription>{description}</CardDescription>}
         </CardHeader>
         <CardContent className="flex-1 ">
-          <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[200px] text-muted-foreground text-black">
             No hay datos disponibles
           </div>
         </CardContent>
@@ -110,7 +110,7 @@ const BarChartHorizontal = function ({
             <Bar 
               dataKey="value" 
               layout="vertical" 
-              radius={3}
+              radius={4}
               className="h-full"
             >
               {formattedData.map((entry, index) => (

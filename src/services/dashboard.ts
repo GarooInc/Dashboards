@@ -84,9 +84,9 @@ export const getAllUsers = async () => {
 /**
  * Listar todos los historiales de chat
  */
-export const getAllChatHistories = async () => {
+export const getAllChatHistories = async (queryParams: string) => {
   try {
-    const response = await fetch(`${VITE_API_SPECTRUM_URL}/chat_histories/`, {
+    const response = await fetch(`${VITE_API_SPECTRUM_URL}/chat_histories/${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -167,9 +167,10 @@ export const getAllDocuments = async () => {
 /**
  * Obtener porcentaje de conversión
  */
-export const getConversionRate = async () => {
+export const getConversionRate = async (queryParams: string) => {
+  console.log("Fetching conversion rate with params:", queryParams);
   try {
-    const response = await fetch(`${VITE_API_SPECTRUM_URL}/analysis/conversion`, {
+    const response = await fetch(`${VITE_API_SPECTRUM_URL}/analysis/conversion${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -192,9 +193,10 @@ export const getConversionRate = async () => {
 /**
  * Distribución de emociones detectadas
  */
-export const getSentimentDistribution = async () => {
+export const getSentimentDistribution = async (queryParams: string) => {
+  console.log("Fetching sentiment distribution with params:", queryParams);
   try {
-    const response = await fetch(`${VITE_API_SPECTRUM_URL}/analysis/sentiment`, {
+    const response = await fetch(`${VITE_API_SPECTRUM_URL}/analysis/sentiment${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -216,9 +218,9 @@ export const getSentimentDistribution = async () => {
 /**
  * Top de palabras clave
  */
-export const getTopKeywords = async () => {
+export const getTopKeywords = async (queryParams: string) => {
   try {
-    const response = await fetch(`${VITE_API_SPECTRUM_URL}/analysis/keywords`, {
+    const response = await fetch(`${VITE_API_SPECTRUM_URL}/analysis/keywords${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -290,9 +292,9 @@ export const getGeneralAnalysis = async () => {
 /**
  * Análisis general de usuarios
  */
-export const getAnalysisChannels = async () => {
+export const getAnalysisChannels = async (queryParams: string) => {
   try {
-    const response = await fetch(`${VITE_API_SPECTRUM_URL}/analysis/channels`, {
+    const response = await fetch(`${VITE_API_SPECTRUM_URL}/analysis/channels${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -311,4 +313,30 @@ export const getAnalysisChannels = async () => {
     throw error;
   }
 };
+
+/**
+ * Promedio ejecución de respuestas
+ */
+export const getAverageResponseTime = async (queryParams: string) => {
+  try {
+    const response = await fetch(`${VITE_API_SPECTRUM_URL}/analysis/average_execution_time${queryParams}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': import.meta.env.VITE_API_KEY
+
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error al obtener tiempo promedio de respuesta:', error);
+    throw error;
+  }
+};
+
 

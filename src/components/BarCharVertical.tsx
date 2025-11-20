@@ -52,7 +52,7 @@ const BarChartVertical = function ({
           {description && <CardDescription>{description}</CardDescription>}
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-center h-[200px] text-muted-foreground">
+          <div className="flex items-center justify-center h-[200px] text-muted-foreground text-black">
             No hay datos disponibles
           </div>
         </CardContent>
@@ -80,7 +80,7 @@ const BarChartVertical = function ({
   }))
 
   return (
-    <Card>
+    <Card className="gap-2">
       <CardHeader>
         <CardTitle className="text-black">{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}

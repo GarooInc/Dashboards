@@ -1,4 +1,5 @@
 import { IoLogOut } from "react-icons/io5";
+import DatePicker from "./DatePicker";
 
 interface HeaderProps {
   title: string;
@@ -6,7 +7,7 @@ interface HeaderProps {
 
 const Header = ({ title }: HeaderProps) => {
   return (
-    <header className="bg-black text-white md:justify-between items-center p-8 flex gap-4 md:flex-row flex-col w-full">
+    <header className="bg-black text-white md:justify-between items-center p-8 flex md:flex-row flex-col w-full">
         <div className="w-[80%] flex justify-center md:justify-start items-center gap-4 md:flex-row flex-col">
           <img src="/assets/images/logo_v2.png" className="md:w-32 w-20" alt='logo' /> 
           <span className="md:block hidden text-xl font-bold">
@@ -14,9 +15,12 @@ const Header = ({ title }: HeaderProps) => {
           </span>
           <h1 className="text-2xl font-bold">{title}</h1>
         </div>
-        <div className="md:flex absolute top-8 right-8 ">
-          <IoLogOut size={24} />
+        <div className="md:flex md:justify-center items-center md:gap-10">
+          <DatePicker />
+          <IoLogOut size={24} className="absolute top-4 right-4 md:static md:top-auto md:right-auto"/>
         </div>
+
+
     </header>
   );
 };
