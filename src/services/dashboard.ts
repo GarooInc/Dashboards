@@ -340,3 +340,58 @@ export const getAverageResponseTime = async (queryParams: string) => {
 };
 
 
+
+/**
+ * Tasa de conversión a lo largo del tiempo
+ */
+export const getConversionRateOverTime = async (queryParams: string) => {
+  try {
+    const response = await fetch(`${VITE_API_SPECTRUM_URL}/analysis/conversion_over_time${queryParams}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': import.meta.env.VITE_API_KEY
+
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error al obtener tiempo promedio de respuesta:', error);
+    throw error;
+  }
+};
+
+/**
+ * Tasa de conversaciones a lo largo del tiempo
+ */
+export const getConversationsOverTime = async (queryParams: string) => {
+  try {
+    const response = await fetch(`${VITE_API_SPECTRUM_URL}/analysis/conversations_over_time${queryParams}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': import.meta.env.VITE_API_KEY
+
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error al obtener tiempo promedio de respuesta:', error);
+    throw error;
+  }
+};
+
+
+
+
+

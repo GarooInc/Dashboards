@@ -2,25 +2,47 @@ import { useState, useEffect } from "react";
 import Header from "../components/Header";
 import Kpi from "../components/Kpi";
 import BarChartHorizontal from "@/components/BarChartHorizontal";
-import BarChartVertical from "@/components/BarCharVertical";
+import BarChartVertical from "@/components/BarChartVertical";
+import { ChartArea } from "@/components/ChartArea";
 import { 
   getAverageResponseTime, 
   getAnalysisChannels, 
   getConversionRate, 
   getTopKeywords, 
-  getSentimentDistribution 
+  getSentimentDistribution ,
+  getConversionRateOverTime,
+  getConversationsOverTime
 } from "../services/dashboard";
 import { useDateFilter } from "@/contexts/DateFilterContext";
 
 function Dashboard() {
-  interface ConversionRateResponse {
+  interface ConversionResponse {
     conversionRate: number;
     totalAppointments: number;
     totalChatHistories: number;
   }
 
+  interface ConversionRatePoint {
+    bucket_start: string;
+    bucket_end: string;
+    range_label?: string;
+    appointments?: number;
+    chats?: number;
+    conversion_rate?: number;
+  }
+
+  interface ConversationsOverTimePoint {
+    bucket_start: string;
+    bucket_end: string;
+    range_label?: string;
+    conversations?: number;
+  }
+
   const { getQueryParams } = useDateFilter();
-  const [conversionRate, setConversionRate] = useState<ConversionRateResponse>({} as ConversionRateResponse);
+  const [conversionRate, setConversionRate] = useState<ConversionResponse>({} as ConversionResponse);
+  const [conversionRatePoints, setConversionRatePoints] = useState<ConversionRatePoint[]>([]);
+
+  const [conversationsOverTimePoints, setConversationsOverTimePoints] = useState<ConversationsOverTimePoint[]>([]);
   const [userChannels, setUserChannels] = useState([]);
   const [topKeywords, setTopKeywords] = useState([]);
   const [sentimentDistribution, setSentimentDistribution] = useState([]);
@@ -65,7 +87,16 @@ function Dashboard() {
         setAverageResponseTime(data.average_execution_time_inSec);
     });
 
-  }, [getQueryParams]); // Se ejecuta cuando cambian los filtros
+    getConversionRateOverTime(queryParams).then(data => {
+      
+        setConversionRatePoints(data.points || []);
+    });
+
+    getConversationsOverTime(queryParams).then(data => {
+        setConversationsOverTimePoints(data.points || []);
+    });
+
+  }, [getQueryParams]); 
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
@@ -80,13 +111,22 @@ function Dashboard() {
         </div>
         <div className="grid md:grid-cols-3 gap-4">
           <BarChartHorizontal title="Distribución de Sentimientos" chartData={sentimentDistribution} />
-          <BarChartHorizontal title="Conversaciones por Keywords" chartData={topKeywords} />
+          <ChartArea 
+            title="Tasa de conversión en el tiempo"
+            dataPoints={conversionRatePoints}
+            dataKeys={{ primary: "conversion_rate" }}
+          />
           <BarChartVertical title="Conversaciones por Canal" chartData={userChannels}/>
         </div>
         <div className="grid md:grid-cols-3 gap-4">
-          <BarChartHorizontal title="Distribución de Sentimientos" chartData={sentimentDistribution} />
+                    <ChartArea 
+            title="Conversaciones en el tiempo"
+            dataPoints={conversationsOverTimePoints}
+            dataKeys={{ primary: "conversations" }}
+          />
+          <div></div>
           <BarChartHorizontal title="Conversaciones por Keywords" chartData={topKeywords} />
-          <BarChartVertical title="Conversaciones por Canal" chartData={userChannels}/>
+
         </div>
       </div>
     </div>

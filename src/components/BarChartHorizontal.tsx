@@ -105,8 +105,7 @@ const BarChartHorizontal = function ({
             <XAxis dataKey="value" type="number" />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
+              content={<ChartTooltipContent className="text-black bg-white" indicator="line" />}/>
             <Bar 
               dataKey="value" 
               layout="vertical" 
