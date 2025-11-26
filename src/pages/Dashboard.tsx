@@ -4,6 +4,7 @@ import Kpi from "../components/Kpi";
 import BarChartHorizontal from "@/components/BarChartHorizontal";
 import BarChartVertical from "@/components/BarChartVertical";
 import { ChartArea } from "@/components/ChartArea";
+import { ConversationSummariesTable } from "@/components/ConversationSummariesTable";
 import { 
   getAverageResponseTime, 
   getAnalysisChannels, 
@@ -11,7 +12,8 @@ import {
   getTopKeywords, 
   getSentimentDistribution,
   getConversionRateOverTime,
-  getConversationsOverTime
+  getConversationsOverTime,
+  getConversationSummaries
 } from "../services/dashboard";
 import { useDateFilter } from "@/contexts/DateFilterContext";
 
@@ -83,6 +85,16 @@ function Dashboard() {
     points: ConversationsOverTimePoint[];
   }
 
+  interface ConversationSummariesAPIResponse {
+    sample_summaries: ConversationSummary[];
+    total_users_with_summary : number;
+  }
+
+  interface ConversationSummary {
+    user: string;
+    summary: string;
+  }
+
   interface ChartDataItem {
     category: string;
     value: number;
@@ -96,11 +108,13 @@ function Dashboard() {
   const [topKeywords, setTopKeywords] = useState<ChartDataItem[]>([]);
   const [sentimentDistribution, setSentimentDistribution] = useState<ChartDataItem[]>([]);
   const [averageResponseTime, setAverageResponseTime] = useState(0);
+  const [conversationSummaries, setConversationSummaries] = useState<ConversationSummary[]>([]);
   const [isLoadingSentiment, setIsLoadingSentiment] = useState(true);
   const [isLoadingChannels, setIsLoadingChannels] = useState(true);
   const [isLoadingKeywords, setIsLoadingKeywords] = useState(true);
   const [isLoadingConversionRatePoints, setIsLoadingConversionRatePoints] = useState(true);
   const [isLoadingConversationsOverTime, setIsLoadingConversationsOverTime] = useState(true);
+  const [isLoadingConversationSummaries, setIsLoadingConversationSummaries] = useState(true);
   const idToken = localStorage.getItem('cognitoToken') || '';
 
   
@@ -163,16 +177,22 @@ function Dashboard() {
     }).catch(() => setConversationsOverTimePoints([]))
       .finally(() => setIsLoadingConversationsOverTime(false));
 
+    getConversationSummaries(idToken).then((data) => {
+      const typedData = data as ConversationSummariesAPIResponse;
+      setConversationSummaries(typedData.sample_summaries || []);
+    }).catch(() => {
+      console.error('Failed to fetch conversation summaries');
+    }).finally(() => setIsLoadingConversationSummaries(false));
+
   }, [getQueryParams]); 
 
   return (
     <div className="bg-white min-h-screen flex flex-col">
       <Header title="Dashboard" />
       <div className="flex-1 flex flex-col md:px-20 md:py-6 gap-4 p-10">
-        <div className="grid md:grid-cols-5 grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-4 grid-cols-2 gap-4">
           <Kpi title="Conversaciones" value={conversionRate.totalChatHistories} />
           <Kpi title="Citas" value={conversionRate.totalAppointments} />
-          <div></div>
           <Kpi title="Tiempo de Respuesta (s)" value={averageResponseTime} />
           <Kpi title="% Conversión de citas" value={conversionRate.conversionRate} />
         </div>
@@ -201,11 +221,14 @@ function Dashboard() {
             dataKeys={{ primary: "conversations" }}
             isLoading={isLoadingConversationsOverTime}
           />
-          <div></div>
           <BarChartHorizontal 
             title="Conversaciones por Keywords" 
             chartData={topKeywords} 
             isLoading={isLoadingKeywords}
+          />
+          <ConversationSummariesTable 
+            data={conversationSummaries} 
+            isLoading={isLoadingConversationSummaries}
           />
         </div>
       </div>

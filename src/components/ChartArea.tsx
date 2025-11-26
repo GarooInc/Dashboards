@@ -1,4 +1,4 @@
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 
 import {
   Card,
@@ -102,6 +102,8 @@ export function ChartArea({ title, dataPoints, dataKeys, isLoading }: ChartAreaP
     })
   } : chartConfig;
 
+  const yAxisLabel = ""
+
   return (
     <Card>
       <CardHeader>
@@ -113,7 +115,7 @@ export function ChartArea({ title, dataPoints, dataKeys, isLoading }: ChartAreaP
             accessibilityLayer
             data={transformedData}
             margin={{
-              left: 12,
+              left: 32,
               right: 12,
             }}
           >
@@ -123,6 +125,17 @@ export function ChartArea({ title, dataPoints, dataKeys, isLoading }: ChartAreaP
               tickLine={false}
               axisLine={false}
               tickMargin={8}
+            />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              label={{
+                value: yAxisLabel,
+                angle: -90,
+                position: 'insideLeft',
+                style: { fill: '#111827' },
+              }}
             />
             <ChartTooltip
               cursor={false}
