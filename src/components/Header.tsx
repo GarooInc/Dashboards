@@ -1,11 +1,16 @@
 import { IoLogOut } from "react-icons/io5";
 import DatePicker from "./DatePicker";
+import { signOut } from "@/services/auth";
+import { useNavigate } from 'react-router-dom'; 
+
 
 interface HeaderProps {
   title: string;
 }
 
 const Header = ({ title }: HeaderProps) => {
+  const navigate = useNavigate();
+
   return (
     <header className="bg-black text-white md:justify-between items-center p-8 flex md:flex-row flex-col w-full">
         <div className="w-[80%] flex justify-center md:justify-start items-center gap-4 md:flex-row flex-col">
@@ -17,7 +22,15 @@ const Header = ({ title }: HeaderProps) => {
         </div>
         <div className="md:flex md:justify-center items-center md:gap-10">
           <DatePicker />
-          <IoLogOut size={24} className="absolute top-4 right-4 md:static md:top-auto md:right-auto"/>
+          <IoLogOut 
+          onClick={async () => {
+            await signOut();
+            navigate('/login');
+
+          }} 
+          cursor="pointer"
+          size={24} 
+          className="absolute top-4 right-4 md:static md:top-auto md:right-auto"/>
         </div>
 
 

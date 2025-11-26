@@ -27,6 +27,7 @@ interface BarChartVerticalProps {
     fill?: string;
   }>;
   valueLabel?: string;
+  isLoading?: boolean;
 }
 
 const CHART_COLORS = [
@@ -41,8 +42,25 @@ const BarChartVertical = function ({
   title = "Chart", 
   description, 
   chartData = [],
-  valueLabel = "Value"
+  valueLabel = "Value",
+  isLoading,
 }: BarChartVerticalProps) {
+
+  if (isLoading) {
+    return (
+      <Card className="gap-2">
+        <CardHeader>
+          <CardTitle className="text-black">{title}</CardTitle>
+          {description && <CardDescription>{description}</CardDescription>}
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center h-[200px] text-black">
+            <span className="loading loading-spinner text-neutral"></span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (!chartData || chartData.length === 0) {
     return (

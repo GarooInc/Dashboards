@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { IoEye } from "react-icons/io5";
 import { IoMdEyeOff } from "react-icons/io";
 import Toast from './Toast';
-// import { signIn } from '../services/auth';
+import { signIn } from '../services/auth';
 import { useNavigate } from 'react-router-dom'; 
 
 type ToastType = 'error' | 'success' | 'warning' | 'info';
@@ -53,15 +53,15 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     }
 
     try {
-      // const session = await signIn(username.trim(), password.trim());
+      const session = await signIn(username.trim(), password.trim());
 
-      // const idToken = session.tokens?.idToken?.toString() ?? '';
-      // localStorage.setItem('cognitoToken', idToken);
+      const idToken = session.tokens?.idToken?.toString() ?? '';
+      localStorage.setItem('cognitoToken', idToken);
 
-      // const shortUsername = username.trim().substring(0, 5);
-      // localStorage.setItem('username', shortUsername);
+      const shortUsername = username.trim().substring(0, 5);
+      localStorage.setItem('username', shortUsername);
 
-      // showNotification('Inicio de sesión exitoso', 'success');
+      showNotification('Inicio de sesión exitoso', 'success');
 
       setTimeout(() => {
         clearNotification();

@@ -9,7 +9,7 @@ import {
   getAnalysisChannels, 
   getConversionRate, 
   getTopKeywords, 
-  getSentimentDistribution ,
+  getSentimentDistribution,
   getConversionRateOverTime,
   getConversationsOverTime
 } from "../services/dashboard";
@@ -20,6 +20,12 @@ function Dashboard() {
     conversionRate: number;
     totalAppointments: number;
     totalChatHistories: number;
+  }
+
+  interface ConversionRateAPIResponse {
+    conversion_rate: number;
+    total_appointments: number;
+    total_chats: number;
   }
 
   interface ConversionRatePoint {
@@ -38,63 +44,124 @@ function Dashboard() {
     conversations?: number;
   }
 
+  interface SentimentItem {
+    sentiment: string;
+    count: number;
+  }
+
+  interface SentimentAPIResponse {
+    sentiments: SentimentItem[];
+  }
+
+  interface ChannelItem {
+    channel: string;
+    count: number;
+  }
+
+  interface ChannelsAPIResponse {
+    channels: ChannelItem[];
+  }
+
+  interface KeywordItem {
+    keyword: string;
+    count: number;
+  }
+
+  interface KeywordsAPIResponse {
+    top_keywords: KeywordItem[];
+  }
+
+  interface AverageResponseTimeAPIResponse {
+    average_execution_time_inSec: number;
+  }
+
+  interface ConversionRateOverTimeAPIResponse {
+    points: ConversionRatePoint[];
+  }
+
+  interface ConversationsOverTimeAPIResponse {
+    points: ConversationsOverTimePoint[];
+  }
+
+  interface ChartDataItem {
+    category: string;
+    value: number;
+  }
+
   const { getQueryParams } = useDateFilter();
   const [conversionRate, setConversionRate] = useState<ConversionResponse>({} as ConversionResponse);
   const [conversionRatePoints, setConversionRatePoints] = useState<ConversionRatePoint[]>([]);
-
   const [conversationsOverTimePoints, setConversationsOverTimePoints] = useState<ConversationsOverTimePoint[]>([]);
-  const [userChannels, setUserChannels] = useState([]);
-  const [topKeywords, setTopKeywords] = useState([]);
-  const [sentimentDistribution, setSentimentDistribution] = useState([]);
+  const [userChannels, setUserChannels] = useState<ChartDataItem[]>([]);
+  const [topKeywords, setTopKeywords] = useState<ChartDataItem[]>([]);
+  const [sentimentDistribution, setSentimentDistribution] = useState<ChartDataItem[]>([]);
   const [averageResponseTime, setAverageResponseTime] = useState(0);
+  const [isLoadingSentiment, setIsLoadingSentiment] = useState(true);
+  const [isLoadingChannels, setIsLoadingChannels] = useState(true);
+  const [isLoadingKeywords, setIsLoadingKeywords] = useState(true);
+  const [isLoadingConversionRatePoints, setIsLoadingConversionRatePoints] = useState(true);
+  const [isLoadingConversationsOverTime, setIsLoadingConversationsOverTime] = useState(true);
+  const idToken = localStorage.getItem('cognitoToken') || '';
+
   
   useEffect(() => {
     const queryParams = getQueryParams();
-
-    getConversionRate(queryParams).then(data => {
+    
+    getConversionRate(queryParams, idToken).then((data) => {
+      const typedData = data as ConversionRateAPIResponse;
       setConversionRate({
-        conversionRate: data.conversion_rate,
-        totalAppointments: data.total_appointments,
-        totalChatHistories: data.total_chats
+        conversionRate: typedData.conversion_rate,
+        totalAppointments: typedData.total_appointments,
+        totalChatHistories: typedData.total_chats
       });
     });
 
-    getSentimentDistribution(queryParams).then(data => {
-      const sentiments = data.sentiments.map((item: { sentiment: string; count: number }) => ({
+    getSentimentDistribution(queryParams, idToken).then((data) => {
+      const typedData = data as SentimentAPIResponse;
+      const sentiments = typedData.sentiments.map((item) => ({
         category: item.sentiment,
         value: item.count
       }));
       setSentimentDistribution(sentiments);
-    });
+    }).catch(() => setSentimentDistribution([]))
+      .finally(() => setIsLoadingSentiment(false));
 
-    getAnalysisChannels(queryParams).then(data => {
-      const channels = data.channels.map((item: { channel: string; count: number }) => ({
+    getAnalysisChannels(queryParams, idToken).then((data) => {
+      const typedData = data as ChannelsAPIResponse;
+      const channels = typedData.channels.map((item) => ({
         category: item.channel,
         value: item.count
       }));
       setUserChannels(channels);
-    });
+    }).catch(() => setUserChannels([]))
+      .finally(() => setIsLoadingChannels(false));
 
-    getTopKeywords(queryParams).then(data => {
-      const keywords = data.top_keywords.map((item: { keyword: string; count: number }) => ({
+    getTopKeywords(queryParams, idToken).then((data) => {
+      const typedData = data as KeywordsAPIResponse;
+      const keywords = typedData.top_keywords.map((item) => ({
         category: item.keyword,
         value: item.count
       }));
       setTopKeywords(keywords);
+    }).catch(() => setTopKeywords([]))
+      .finally(() => setIsLoadingKeywords(false));
+
+    getAverageResponseTime(queryParams, idToken).then((data) => {
+      const typedData = data as AverageResponseTimeAPIResponse;
+      setAverageResponseTime(typedData.average_execution_time_inSec);
     });
 
-    getAverageResponseTime(queryParams).then(data => {
-        setAverageResponseTime(data.average_execution_time_inSec);
-    });
+    getConversionRateOverTime(queryParams, idToken).then((data) => {
+      const typedData = data as ConversionRateOverTimeAPIResponse;
+      setConversionRatePoints(typedData.points || []);
+    }).catch(() => setConversionRatePoints([]))
+      .finally(() => setIsLoadingConversionRatePoints(false));
 
-    getConversionRateOverTime(queryParams).then(data => {
-      
-        setConversionRatePoints(data.points || []);
-    });
-
-    getConversationsOverTime(queryParams).then(data => {
-        setConversationsOverTimePoints(data.points || []);
-    });
+    getConversationsOverTime(queryParams, idToken).then((data) => {
+      const typedData = data as ConversationsOverTimeAPIResponse;
+      setConversationsOverTimePoints(typedData.points || []);
+    }).catch(() => setConversationsOverTimePoints([]))
+      .finally(() => setIsLoadingConversationsOverTime(false));
 
   }, [getQueryParams]); 
 
@@ -110,23 +177,36 @@ function Dashboard() {
           <Kpi title="% Conversión de citas" value={conversionRate.conversionRate} />
         </div>
         <div className="grid md:grid-cols-3 gap-4">
-          <BarChartHorizontal title="Distribución de Sentimientos" chartData={sentimentDistribution} />
+          <BarChartHorizontal 
+            title="Distribución de Sentimientos" 
+            chartData={sentimentDistribution}
+            isLoading={isLoadingSentiment} 
+          />
           <ChartArea 
             title="Tasa de conversión en el tiempo"
             dataPoints={conversionRatePoints}
             dataKeys={{ primary: "conversion_rate" }}
+            isLoading={isLoadingConversionRatePoints}
           />
-          <BarChartVertical title="Conversaciones por Canal" chartData={userChannels}/>
+          <BarChartVertical 
+            title="Conversaciones por Canal" 
+            chartData={userChannels}
+            isLoading={isLoadingChannels}
+          />
         </div>
         <div className="grid md:grid-cols-3 gap-4">
-                    <ChartArea 
+          <ChartArea 
             title="Conversaciones en el tiempo"
             dataPoints={conversationsOverTimePoints}
             dataKeys={{ primary: "conversations" }}
+            isLoading={isLoadingConversationsOverTime}
           />
           <div></div>
-          <BarChartHorizontal title="Conversaciones por Keywords" chartData={topKeywords} />
-
+          <BarChartHorizontal 
+            title="Conversaciones por Keywords" 
+            chartData={topKeywords} 
+            isLoading={isLoadingKeywords}
+          />
         </div>
       </div>
     </div>
