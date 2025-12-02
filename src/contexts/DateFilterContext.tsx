@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useCallback, useMemo } from "react";
 import { format, subDays } from "date-fns";
 import type { DateRange } from "react-day-picker";
 
@@ -22,7 +22,7 @@ export function DateFilterProvider({ children }: { children: React.ReactNode }) 
   });
   const [preset, setPreset] = useState<DatePreset>("last_month");
 
-  const getQueryParams = () => {
+  const getQueryParams = useCallback(() => {
     if (preset === "today") return "?today=true";
     if (preset === "last_month") return "?last_month=true";
     if (preset === "last_year") return "?last_year=true";
@@ -31,9 +31,9 @@ export function DateFilterProvider({ children }: { children: React.ReactNode }) 
       return `?start_date=${format(date.from, "yyyy-MM-dd")}&end_date=${format(date.to, "yyyy-MM-dd")}`;
     }
     return "";
-  };
+  }, [date, preset]);
 
-  const formatDateRange = () => {
+  const formatDateRange = useCallback(() => {
     if (!date?.from) return "Select date range";
     
     if (preset === "today") return "Today";
@@ -44,18 +44,23 @@ export function DateFilterProvider({ children }: { children: React.ReactNode }) 
       return `${format(date.from, "MMM d, yyyy")} - ${format(date.to, "MMM d, yyyy")}`;
     }
     return format(date.from, "MMM d, yyyy");
-  };
+  }, [date, preset]);
+
+  const contextValue = useMemo(
+    () => ({
+      date,
+      preset,
+      setDate,
+      setPreset,
+      getQueryParams,
+      formatDateRange,
+    }),
+    [date, preset, getQueryParams, formatDateRange]
+  );
 
   return (
     <DateFilterContext.Provider
-      value={{
-        date,
-        preset,
-        setDate,
-        setPreset,
-        getQueryParams,
-        formatDateRange,
-      }}
+      value={contextValue}
     >
       {children}
     </DateFilterContext.Provider>

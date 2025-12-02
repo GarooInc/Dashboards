@@ -40,10 +40,9 @@ interface ChartAreaProps {
     primary: string;
     secondary?: string;
   };
-  isLoading?: boolean;
 }
 
-export function ChartArea({ title, dataPoints, dataKeys, isLoading }: ChartAreaProps) {  
+export function ChartArea({ title, dataPoints, dataKeys }: ChartAreaProps) {  
   const transformedData = dataPoints?.map(point => {
     const startDate = new Date(point.bucket_start);
     const dateLabel = startDate.toLocaleDateString('es-ES', { 
@@ -58,22 +57,6 @@ export function ChartArea({ title, dataPoints, dataKeys, isLoading }: ChartAreaP
     };
   }) || [];
   
-
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-black">{title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-[200px] text-black">
-            <span className="loading loading-spinner text-neutral"></span>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   if (!transformedData || transformedData.length === 0) {
     return (
       <Card>

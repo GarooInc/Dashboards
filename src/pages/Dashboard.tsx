@@ -109,6 +109,8 @@ function Dashboard() {
   const [sentimentDistribution, setSentimentDistribution] = useState<ChartDataItem[]>([]);
   const [averageResponseTime, setAverageResponseTime] = useState(0);
   const [conversationSummaries, setConversationSummaries] = useState<ConversationSummary[]>([]);
+  const [isLoadingConversionRate, setIsLoadingConversionRate] = useState(true);
+  const [isLoadingAverageResponseTime, setIsLoadingAverageResponseTime] = useState(true);
   const [isLoadingSentiment, setIsLoadingSentiment] = useState(true);
   const [isLoadingChannels, setIsLoadingChannels] = useState(true);
   const [isLoadingKeywords, setIsLoadingKeywords] = useState(true);
@@ -119,6 +121,15 @@ function Dashboard() {
 
   
   useEffect(() => {
+    setIsLoadingConversionRate(true);
+    setIsLoadingAverageResponseTime(true);
+    setIsLoadingSentiment(true);
+    setIsLoadingChannels(true);
+    setIsLoadingKeywords(true);
+    setIsLoadingConversionRatePoints(true);
+    setIsLoadingConversationsOverTime(true);
+    setIsLoadingConversationSummaries(true);
+
     const queryParams = getQueryParams();
     
     getConversionRate(queryParams, idToken).then((data) => {
@@ -128,7 +139,13 @@ function Dashboard() {
         totalAppointments: typedData.total_appointments,
         totalChatHistories: typedData.total_chats
       });
-    });
+    }).catch(() => {
+      setConversionRate({
+        conversionRate: 0,
+        totalAppointments: 0,
+        totalChatHistories: 0
+      });
+    }).finally(() => setIsLoadingConversionRate(false));
 
     getSentimentDistribution(queryParams, idToken).then((data) => {
       const typedData = data as SentimentAPIResponse;
@@ -163,7 +180,9 @@ function Dashboard() {
     getAverageResponseTime(queryParams, idToken).then((data) => {
       const typedData = data as AverageResponseTimeAPIResponse;
       setAverageResponseTime(typedData.average_execution_time_inSec);
-    });
+    }).catch(() => {
+      setAverageResponseTime(0);
+    }).finally(() => setIsLoadingAverageResponseTime(false));
 
     getConversionRateOverTime(queryParams, idToken).then((data) => {
       const typedData = data as ConversionRateOverTimeAPIResponse;
@@ -182,14 +201,32 @@ function Dashboard() {
       setConversationSummaries(typedData.sample_summaries || []);
     }).catch(() => {
       console.error('Failed to fetch conversation summaries');
+      setConversationSummaries([]);
     }).finally(() => setIsLoadingConversationSummaries(false));
 
-  }, [getQueryParams]); 
+  }, [getQueryParams, idToken]); 
+
+  const isDashboardLoading = 
+    isLoadingConversionRate ||
+    isLoadingAverageResponseTime ||
+    isLoadingSentiment ||
+    isLoadingChannels ||
+    isLoadingKeywords ||
+    isLoadingConversionRatePoints ||
+    isLoadingConversationsOverTime ||
+    isLoadingConversationSummaries;
 
   return (
-    <div className="bg-white min-h-screen flex flex-col">
+    <div className="bg-white min-h-screen flex flex-col relative">
+      {isDashboardLoading && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+          <div className="flex items-center gap-3 text-black">
+            <span className="loading loading-spinner text-white"></span>
+          </div>
+        </div>
+      )}
       <Header title="Dashboard" />
-      <div className="flex-1 flex flex-col md:px-20 md:py-6 gap-4 p-10">
+      <div className="flex-1 flex flex-col md:px-20 md:py-6 gap-4 p-10 relative z-10">
         <div className="grid md:grid-cols-4 grid-cols-2 gap-4">
           <Kpi title="Conversaciones" value={conversionRate.totalChatHistories} />
           <Kpi title="Citas" value={conversionRate.totalAppointments} />
@@ -200,18 +237,15 @@ function Dashboard() {
           <BarChartHorizontal 
             title="Distribución de Sentimientos" 
             chartData={sentimentDistribution}
-            isLoading={isLoadingSentiment} 
           />
           <ChartArea 
             title="Tasa de conversión en el tiempo"
             dataPoints={conversionRatePoints}
             dataKeys={{ primary: "conversion_rate" }}
-            isLoading={isLoadingConversionRatePoints}
           />
           <BarChartVertical 
             title="Conversaciones por Canal" 
             chartData={userChannels}
-            isLoading={isLoadingChannels}
           />
         </div>
         <div className="grid md:grid-cols-3 gap-4">
@@ -219,16 +253,13 @@ function Dashboard() {
             title="Conversaciones en el tiempo"
             dataPoints={conversationsOverTimePoints}
             dataKeys={{ primary: "conversations" }}
-            isLoading={isLoadingConversationsOverTime}
           />
           <BarChartHorizontal 
             title="Conversaciones por Keywords" 
             chartData={topKeywords} 
-            isLoading={isLoadingKeywords}
           />
           <ConversationSummariesTable 
             data={conversationSummaries} 
-            isLoading={isLoadingConversationSummaries}
           />
         </div>
       </div>

@@ -41,7 +41,7 @@ const columns: ColumnDef<ConversationSummary>[] = [
 ];
 
 // Componente principal
-export function ConversationSummariesTable({ data, isLoading = false }: { data: ConversationSummary[]; isLoading?: boolean }) {
+export function ConversationSummariesTable({ data }: { data: ConversationSummary[] }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
@@ -70,19 +70,7 @@ export function ConversationSummariesTable({ data, isLoading = false }: { data: 
         <div className="rounded-md border mx-4">
             <Table className="border-none outline-0 overflow-y-auto">
             <TableBody>
-                {isLoading ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-28 text-center text-xs"
-                    >
-                      <div className="flex items-center justify-center gap-2 text-black">
-                        <span className="loading loading-spinner text-neutral"></span>
-                        <span>Cargando...</span>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : table.getRowModel().rows?.length ? (
+                {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                     <TableRow
                     key={row.id}

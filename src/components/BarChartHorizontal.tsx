@@ -24,7 +24,6 @@ interface ChartBarMixedProps {
   }>;
   valueLabel?: string;
   maxHeight?: number | string;
-  isLoading?: boolean;
 }
 
 const CHART_COLORS = [
@@ -40,25 +39,7 @@ const BarChartHorizontal = function ({
   description, 
   chartData = [],
   valueLabel = "Value",
-  isLoading,
 }: ChartBarMixedProps) {
-  
-  if (isLoading) {
-    return (
-      <Card className="flex flex-col">
-        <CardHeader>
-          <CardTitle className="text-black">{title}</CardTitle>
-          {description && <CardDescription>{description}</CardDescription>}
-        </CardHeader>
-        <CardContent className="flex-1 ">
-          <div className="flex items-center justify-center h-[200px] text-black">
-            <span className="loading loading-spinner text-neutral"></span>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   if (!chartData || chartData.length === 0) {
     return (
       <Card className="flex flex-col">
