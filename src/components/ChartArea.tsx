@@ -35,6 +35,7 @@ interface ChartAreaProps {
     range_label?: string;
     conversations?: number;
     conversion_rate?: number;
+    appointments?: number;
   }>;
   dataKeys?: {
     primary: string;
@@ -54,6 +55,7 @@ export function ChartArea({ title, dataPoints, dataKeys }: ChartAreaProps) {
       date: dateLabel,
       conversations: point.conversations || 0,
       conversion_rate: point.conversion_rate || 0,
+      appointments: point.appointments || 0,
     };
   }) || [];
   

@@ -254,6 +254,7 @@ export const getConversationsOverTime = async (queryParams: string, token: strin
     
     const json = await response.json();
     const data = parsePayload(json);
+    console.log('ConversationsOverTime data:', data);
     return data;
 
   } catch (error) {
@@ -261,6 +262,37 @@ export const getConversationsOverTime = async (queryParams: string, token: strin
     throw error;
   }
 };
+
+
+/**
+ * Tasa de citas a lo largo del tiempo
+ */
+export const getAppointmentsOverTime = async (queryParams: string, token: string) => {
+  try {
+    const response = await fetch(`${VITE_BACKEND_URL}/Tenancy/dashboard/appointments_over_time${queryParams}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+    
+    const json = await response.json();
+    const data = parsePayload(json);
+    console.log('AppointmentsOverTime data:', data);
+    return data;
+
+  } catch (error) {
+    console.error('Error al obtener tiempo promedio de respuesta:', error);
+    throw error;
+  }
+};
+
 
 
 

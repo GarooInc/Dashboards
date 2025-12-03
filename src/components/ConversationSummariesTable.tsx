@@ -45,8 +45,6 @@ export function ConversationSummariesTable({ data }: { data: ConversationSummary
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  console.log('ConversationSummariesTabledata:', data);
-
   const table = useReactTable({
     data: data,
     columns,
