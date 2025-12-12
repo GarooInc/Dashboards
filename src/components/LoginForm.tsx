@@ -19,8 +19,8 @@ const LoginForm = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState<Notification | null>(null);
-  const navigate = useNavigate();
 
+  const navigate = useNavigate();
 
   const showNotification = (message: string, type: ToastType) => {
     setNotification({ message: message, type: type });
@@ -42,7 +42,7 @@ const LoginForm = () => {
     setPassword(e.target.value);
   };
 
-const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -56,6 +56,8 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       const session = await signIn(username.trim(), password.trim());
 
       const idToken = session.tokens?.idToken?.toString() ?? '';
+      
+      // Store token in context and localStorage
       localStorage.setItem('cognitoToken', idToken);
 
       const shortUsername = username.trim().substring(0, 5);
@@ -82,6 +84,7 @@ const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       setIsLoading(false);
     }
   };
+
   return (
     <>
       <div className="card bg-white w-full max-w-sm shrink-0 shadow-2xl">

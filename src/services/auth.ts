@@ -1,3 +1,11 @@
+
+type Tenant = {
+  tenant_id: string;
+  display_name: string;
+  plan: string;
+  role: string;
+};
+
 // auth.ts
 import type { SignUpOutput } from 'aws-amplify/auth';
 import {
@@ -69,4 +77,21 @@ export const checkSession = async () => {
   }
 
   return session;
+};
+
+export const getTenants = async (token: string): Promise<Tenant[]> => {
+  const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/users/my-tenants`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Error fetching tenants: ${response.status}`);
+  }
+
+  const json = await response.json();
+  return json.tenants || [];
 };

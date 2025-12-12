@@ -14,9 +14,10 @@ import {
   getConversionRateOverTime,
   getConversationsOverTime,
   getAppointmentsOverTime,
-
 } from "../services/dashboard";
+import { getTenants } from "../services/auth";
 import { useDateFilter } from "@/contexts/DateFilterContext";
+import { useTenant } from "@/contexts/TenantContext";
 
 function Dashboard() {
   interface ConversionResponse {
@@ -47,13 +48,12 @@ function Dashboard() {
     conversations?: number;
   }
 
-    interface AppointmentsOverTimePoint {
+  interface AppointmentsOverTimePoint {
     bucket_start: string;
     bucket_end: string;
     range_label?: string;
     appointments?: number;
   }
-
 
   interface SentimentItem {
     sentiment: string;
@@ -95,9 +95,8 @@ function Dashboard() {
   }
 
   interface AppointmentsOverTimeAPIResponse {
-    points : AppointmentsOverTimePoint[];
+    points: AppointmentsOverTimePoint[];
   }
-
 
   interface ChartDataItem {
     category: string;
@@ -117,101 +116,138 @@ function Dashboard() {
   const [appointmentsOverTimePoints, setAppointmentsOverTimePoints] = useState<ConversationsOverTimePoint[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isFetchingTenants, setIsFetchingTenants] = useState(true);
   const idToken = localStorage.getItem('cognitoToken') || '';
 
-  
+  const { selectedTenant, tenants, setTenants, setSelectedTenant } = useTenant();
+
   useEffect(() => {
+    const fetchTenants = async () => {
+      if (!idToken) {
+        setIsFetchingTenants(false);
+        return;
+      }
+
+      if (tenants && tenants.length > 0) {
+        setIsFetchingTenants(false);
+        return;
+      }
+
+      try {
+        const fetchedTenants = await getTenants(idToken);
+        setTenants(fetchedTenants);
+        
+        // Set first tenant as default if none selected
+        if (fetchedTenants && fetchedTenants.length > 0 && !selectedTenant) {
+          setSelectedTenant(fetchedTenants[0]);
+        }
+      } catch (error) {
+        console.error('Error fetching tenants:', error);
+      } finally {
+        setIsFetchingTenants(false);
+      }
+    };
+
+    fetchTenants();
+  }, [idToken, tenants, selectedTenant, setTenants, setSelectedTenant]);
+
+  // Fetch dashboard data when tenant or date changes
+  useEffect(() => {
+    // Wait for tenants to be loaded and a tenant to be selected
+    if (isFetchingTenants || !selectedTenant?.tenant_id) {
+      return;
+    }
+
     setIsLoading(true);
 
     Promise.all([
-    getConversionRate(queryParams, idToken)
-      .then((data) => {
-        const typedData = data as ConversionRateAPIResponse;
-        setConversionRate({
-          conversionRate: typedData.conversion_rate,
-          totalAppointments: typedData.total_appointments,
-          totalChatHistories: typedData.total_chats
-        });
-      })
-      .catch(() => {
-        setConversionRate({
-          conversionRate: 0,
-          totalAppointments: 0,
-          totalChatHistories: 0
-        });
-      }),
-    
-    getSentimentDistribution(queryParams, idToken)
-      .then((data) => {
-        const typedData = data as SentimentAPIResponse;
-        const sentiments = typedData.sentiments.map((item) => ({
-          category: item.sentiment,
-          value: item.count
-        }));
-        setSentimentDistribution(sentiments);
-      })
-      .catch(() => setSentimentDistribution([])),
-    
-    getAnalysisChannels(queryParams, idToken)
-      .then((data) => {
-        const typedData = data as ChannelsAPIResponse;
-        const channels = typedData.channels.map((item) => ({
-          category: item.channel,
-          value: item.count
-        }));
-        setUserChannels(channels);
-      })
-      .catch(() => setUserChannels([])),
-    
-    getTopKeywords(queryParams, idToken)
-      .then((data) => {
-        const typedData = data as KeywordsAPIResponse;
-        const keywords = typedData.top_keywords.map((item) => ({
-          category: item.keyword,
-          value: item.count
-        }));
-        setTopKeywords(keywords);
-      })
-      .catch(() => setTopKeywords([])),
-    
-    getAverageResponseTime(queryParams, idToken)
-      .then((data) => {
-        const typedData = data as AverageResponseTimeAPIResponse;
-        setAverageResponseTime(typedData.average_execution_time_inSec);
-      })
-      .catch(() => setAverageResponseTime(0)),
-    
-    getConversionRateOverTime(queryParams, idToken)
-      .then((data) => {
-        const typedData = data as ConversionRateOverTimeAPIResponse;
-        setConversionRatePoints(typedData.points || []);
-      })
-      .catch(() => setConversionRatePoints([])),
-    
-    getConversationsOverTime(queryParams, idToken)
-      .then((data) => {
-        const typedData = data as ConversationsOverTimeAPIResponse;
-        setConversationsOverTimePoints(typedData.points || []);
-      })
-      .catch(() => setConversationsOverTimePoints([])),
-    
-    getAppointmentsOverTime(queryParams, idToken)
-      .then((data) => {
-        const typedData = data as AppointmentsOverTimeAPIResponse;
-        setAppointmentsOverTimePoints(typedData.points || []);
-      })
-      .catch(() => setAppointmentsOverTimePoints([]))
-  ]).finally(() => {
-    setIsLoading(false);
-  });
+      getConversionRate(queryParams, idToken, selectedTenant?.tenant_id)
+        .then((data) => {
+          const typedData = data as ConversionRateAPIResponse;
+          setConversionRate({
+            conversionRate: typedData.conversion_rate,
+            totalAppointments: typedData.total_appointments,
+            totalChatHistories: typedData.total_chats
+          });
+        })
+        .catch(() => {
+          setConversionRate({
+            conversionRate: 0,
+            totalAppointments: 0,
+            totalChatHistories: 0
+          });
+        }),
+      
+      getSentimentDistribution(queryParams, idToken, selectedTenant?.tenant_id)
+        .then((data) => {
+          const typedData = data as SentimentAPIResponse;
+          const sentiments = typedData.sentiments.map((item) => ({
+            category: item.sentiment,
+            value: item.count
+          }));
+          setSentimentDistribution(sentiments);
+        })
+        .catch(() => setSentimentDistribution([])),
+      
+      getAnalysisChannels(queryParams, idToken, selectedTenant?.tenant_id)
+        .then((data) => {
+          const typedData = data as ChannelsAPIResponse;
+          const channels = typedData.channels.map((item) => ({
+            category: item.channel,
+            value: item.count
+          }));
+          setUserChannels(channels);
+        })
+        .catch(() => setUserChannels([])),
+      
+      getTopKeywords(queryParams, idToken, selectedTenant?.tenant_id)
+        .then((data) => {
+          const typedData = data as KeywordsAPIResponse;
+          const keywords = typedData.top_keywords.map((item) => ({
+            category: item.keyword,
+            value: item.count
+          }));
+          setTopKeywords(keywords);
+        })
+        .catch(() => setTopKeywords([])),
+      
+      getAverageResponseTime(queryParams, idToken, selectedTenant?.tenant_id)
+        .then((data) => {
+          const typedData = data as AverageResponseTimeAPIResponse;
+          setAverageResponseTime(typedData.average_execution_time_inSec);
+        })
+        .catch(() => setAverageResponseTime(0)),
+      
+      getConversionRateOverTime(queryParams, idToken, selectedTenant?.tenant_id)
+        .then((data) => {
+          const typedData = data as ConversionRateOverTimeAPIResponse;
+          setConversionRatePoints(typedData.points || []);
+        })
+        .catch(() => setConversionRatePoints([])),
+      
+      getConversationsOverTime(queryParams, idToken, selectedTenant?.tenant_id)
+        .then((data) => {
+          const typedData = data as ConversationsOverTimeAPIResponse;
+          setConversationsOverTimePoints(typedData.points || []);
+        })
+        .catch(() => setConversationsOverTimePoints([])),
+      
+      getAppointmentsOverTime(queryParams, idToken, selectedTenant?.tenant_id)
+        .then((data) => {
+          const typedData = data as AppointmentsOverTimeAPIResponse;
+          setAppointmentsOverTimePoints(typedData.points || []);
+        })
+        .catch(() => setAppointmentsOverTimePoints([]))
+    ]).finally(() => {
+      setIsLoading(false);
+    });
 
-
-  }, [queryParams, idToken]); 
+  }, [queryParams, idToken, selectedTenant, isFetchingTenants]); 
 
   return (
     <div className="bg-white min-h-screen flex flex-col relative">
-      {isLoading && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      {(isLoading || isFetchingTenants) && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/80 backdrop-blur-sm md:h-full h-screen">
           <div className="flex items-center gap-3 text-black">
             <span className="loading loading-spinner text-white"></span>
           </div>
@@ -250,7 +286,7 @@ function Dashboard() {
             title="Conversaciones por Keywords" 
             chartData={topKeywords} 
           />
-            <ChartArea 
+          <ChartArea 
             title="Citas en el tiempo"
             dataPoints={appointmentsOverTimePoints}
             dataKeys={{ primary: "appointments" }}

@@ -2,6 +2,7 @@ import { IoLogOut } from "react-icons/io5";
 import DatePicker from "./DatePicker";
 import { signOut } from "@/services/auth";
 import { useNavigate } from 'react-router-dom'; 
+import AccountPicker from "./AccountPicker";
 
 
 interface HeaderProps {
@@ -21,7 +22,10 @@ const Header = ({ title }: HeaderProps) => {
           <h1 className="text-2xl font-bold">{title}</h1>
         </div>
         <div className="md:flex md:justify-center items-center md:gap-10">
-          <DatePicker />
+          <div className="flex md:flex-row flex-col mt-2 justify-center items-center md:h-10 gap-4">
+            <AccountPicker />
+            <DatePicker />
+          </div>
           <IoLogOut 
           onClick={async () => {
             await signOut();

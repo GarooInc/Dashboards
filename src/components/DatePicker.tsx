@@ -10,7 +10,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useDateFilter } from "@/contexts/DateFilterContext";
-
+import { ChevronDown } from "lucide-react";
 type DatePreset = "today" | "last_month" | "last_year" | "custom";
 
 export default function DatePicker() {
@@ -42,18 +42,20 @@ export default function DatePicker() {
   };
 
   return (
-    <div className="flex flex-col gap-6 md:mt-0 mt-10">
+    <div className="flex flex-col gap-6 h-full w-full">
       <div className="max-w-md">
         <Popover open={isOpen} onOpenChange={setIsOpen}>
           <PopoverTrigger asChild>
             <Button
               className={cn(
-                "w-full justify-start text-left font-normal bg-white text-black hover:bg-gray-200",
+                "w-full justify-start text-left font-normal bg-white text-black hover:bg-gray-200 h-full",
                 !date && "text-muted-foreground"
               )}
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {formatDateRange()}
+              <ChevronDown className="h-4 w-4 ml-2" />
+
             </Button>
           </PopoverTrigger>
           <PopoverContent className="md:w-auto w-full p-0 bg-white md:mr-20 text-black border-none shadow-xl" align="start">

@@ -1,4 +1,5 @@
 const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+ 
 
 const parsePayload = (json: unknown) => {
   if (json && typeof json === 'object' && 'data' in json) {
@@ -15,13 +16,15 @@ const parsePayload = (json: unknown) => {
 /**
  * Obtener porcentaje de conversión
  */
-export const getConversionRate = async (queryParams: string, token : string) => {
+export const getConversionRate = async (queryParams: string, token : string, tenantId?: string) => {
+
   try {
-    const response = await fetch(`${VITE_BACKEND_URL}/Tenancy/dashboard/conversion${queryParams}`, {
+    const response = await fetch(`${VITE_BACKEND_URL}/dashboard/conversion${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': tenantId || ''
       },
     });
     
@@ -41,13 +44,14 @@ export const getConversionRate = async (queryParams: string, token : string) => 
 /**
  * Distribución de emociones detectadas
  */
-export const getSentimentDistribution = async (queryParams: string, token: string) => {
+export const getSentimentDistribution = async (queryParams: string, token: string, tenantId?: string) => {
   try {
-    const response = await fetch(`${VITE_BACKEND_URL}/Tenancy/dashboard/sentiment${queryParams}`, {
+    const response = await fetch(`${VITE_BACKEND_URL}/dashboard/sentiment${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': tenantId || ''
       },
     });
     
@@ -68,13 +72,14 @@ export const getSentimentDistribution = async (queryParams: string, token: strin
 /**
  * Top de palabras clave
  */
-export const getTopKeywords = async (queryParams: string, token: string) => {
+export const getTopKeywords = async (queryParams: string, token: string, tenantId?: string) => {
   try {
-    const response = await fetch(`${VITE_BACKEND_URL}/Tenancy/dashboard/keywords${queryParams}`, {
+    const response = await fetch(`${VITE_BACKEND_URL}/dashboard/keywords${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': tenantId || ''
       },
     });
     
@@ -95,13 +100,14 @@ export const getTopKeywords = async (queryParams: string, token: string) => {
 /**
  * Resumen de conversaciones de usuarios
  */
-export const getConversationSummaries = async (token: string) => {
+export const getConversationSummaries = async (token: string, tenantId?: string) => {
   try {
-    const response = await fetch(`${VITE_BACKEND_URL}/Tenancy/dashboard/summaries`, {
+    const response = await fetch(`${VITE_BACKEND_URL}/dashboard/summaries`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': tenantId || ''
       },
     });
     
@@ -122,13 +128,14 @@ export const getConversationSummaries = async (token: string) => {
 /**
  * Análisis general de usuarios
  */
-export const getGeneralAnalysis = async (token: string) => {
+export const getGeneralAnalysis = async (token: string, tenantId?: string) => {
   try {
-    const response = await fetch(`${VITE_BACKEND_URL}/Tenancy/dashboard/`, {
+    const response = await fetch(`${VITE_BACKEND_URL}/dashboard/`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': tenantId || ''
 
       },
     });
@@ -151,13 +158,14 @@ export const getGeneralAnalysis = async (token: string) => {
 /**
  * Análisis general de usuarios
  */
-export const getAnalysisChannels = async (queryParams: string, token: string) => {
+export const getAnalysisChannels = async (queryParams: string, token: string, tenantId?: string) => {
   try {
-    const response = await fetch(`${VITE_BACKEND_URL}/Tenancy/dashboard/channels${queryParams}`, {
+    const response = await fetch(`${VITE_BACKEND_URL}/dashboard/channels${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': tenantId || ''
 
       },
     });
@@ -179,13 +187,14 @@ export const getAnalysisChannels = async (queryParams: string, token: string) =>
 /**
  * Promedio ejecución de respuestas
  */
-export const getAverageResponseTime = async (queryParams: string, token: string) => {
+export const getAverageResponseTime = async (queryParams: string, token: string, tenantId?: string) => {
   try {
-    const response = await fetch(`${VITE_BACKEND_URL}/Tenancy/dashboard/average_execution_time${queryParams}`, {
+    const response = await fetch(`${VITE_BACKEND_URL}/dashboard/average_execution_time${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': tenantId || ''
 
       },
     });
@@ -209,13 +218,14 @@ export const getAverageResponseTime = async (queryParams: string, token: string)
 /**
  * Tasa de conversión a lo largo del tiempo
  */
-export const getConversionRateOverTime = async (queryParams: string, token: string) => {
+export const getConversionRateOverTime = async (queryParams: string, token: string, tenantId?: string) => {
   try {
-    const response = await fetch(`${VITE_BACKEND_URL}/Tenancy/dashboard/conversion-over-time${queryParams}`, {
+    const response = await fetch(`${VITE_BACKEND_URL}/dashboard/conversion-over-time${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': tenantId || ''
 
       },
     });
@@ -237,13 +247,14 @@ export const getConversionRateOverTime = async (queryParams: string, token: stri
 /**
  * Tasa de conversaciones a lo largo del tiempo
  */
-export const getConversationsOverTime = async (queryParams: string, token: string) => {
+export const getConversationsOverTime = async (queryParams: string, token: string, tenantId?: string) => {
   try {
-    const response = await fetch(`${VITE_BACKEND_URL}/Tenancy/dashboard/conversations-over-time${queryParams}`, {
+    const response = await fetch(`${VITE_BACKEND_URL}/dashboard/conversations-over-time${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': tenantId || ''
 
       },
     });
@@ -267,13 +278,14 @@ export const getConversationsOverTime = async (queryParams: string, token: strin
 /**
  * Tasa de citas a lo largo del tiempo
  */
-export const getAppointmentsOverTime = async (queryParams: string, token: string) => {
+export const getAppointmentsOverTime = async (queryParams: string, token: string, tenantId?: string) => {
   try {
-    const response = await fetch(`${VITE_BACKEND_URL}/Tenancy/dashboard/appointments_over_time${queryParams}`, {
+    const response = await fetch(`${VITE_BACKEND_URL}/dashboard/appointments_over_time${queryParams}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'x-tenant-id': tenantId || ''
 
       },
     });
