@@ -151,10 +151,13 @@ function Dashboard() {
     fetchTenants();
   }, [idToken, tenants, selectedTenant, setTenants, setSelectedTenant]);
 
-  // Fetch dashboard data when tenant or date changes
   useEffect(() => {
-    // Wait for tenants to be loaded and a tenant to be selected
-    if (isFetchingTenants || !selectedTenant?.tenant_id) {
+    if (isFetchingTenants) {
+      return;
+    }
+
+    if (!selectedTenant?.tenant_id) {
+      setIsLoading(false);
       return;
     }
 
