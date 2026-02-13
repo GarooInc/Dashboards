@@ -13,6 +13,7 @@ import {
   signUp as amplifySignUp,
   signOut as amplifySignOut,
   fetchAuthSession,
+  confirmSignUp,
 } from 'aws-amplify/auth';
 
 const ORIGINAL_EXP_KEY = 'original_exp';
@@ -94,4 +95,29 @@ export const getTenants = async (token: string): Promise<Tenant[]> => {
 
   const json = await response.json();
   return json.tenants || [];
+};
+
+interface CodeVerificationParams {
+  email: string;
+  code: string;
+}
+
+interface CodeVerificationResult {
+  success: boolean;
+  message: string;
+}
+
+export const codeVerification = async ({ email, code }: CodeVerificationParams): Promise<CodeVerificationResult> => {
+  try {
+    await confirmSignUp({
+      username: email,
+      confirmationCode: code,
+    });
+    
+    console.log('Code verification success');
+    return { success: true, message: 'Verificación exitosa' };
+  } catch (err) {
+    console.error('Code verification error:', err);
+    throw err;
+  }
 };

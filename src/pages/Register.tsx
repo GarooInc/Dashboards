@@ -1,12 +1,12 @@
-import LoginForm from "../components/LoginForm"
+import RegisterForm from "@/components/RegisterForm";
 
-function Login (){
+function Register (){
 
     return (
         <div className='md:hero h-full w-full'>
                 <div className="hero-content flex flex-col-reverse lg:flex-row lg:h-full w-full p-0 max-w-full gap-0">
                     <div className='w-full lg:w-1/2'>
-                        <div className="relative md:h-screen w-full text-4xl font-bold  bg-linear-to-r from-black to-[#cd1e1a]">
+                        <div className="relative md:h-screen w-full text-4xl font-bold  bg-gradient-to-r from-[#000] to-[#cd1e1a]">
                             <div className="md:absolute inset-0 bg-black opacity-40 hidden md:block"></div>
                             <div className="md:absolute -right-10 top-1/2 transform -translate-y-1/2 h-full w-16 bg-white rounded-xl hidden md:block"></div>
                         </div>
@@ -19,7 +19,7 @@ function Login (){
                             <div className='flex flex-col items-center justify-center  gap-4 w-full'>
                                 <h2 className='text-4xl font-bold bg-clip-text text-[#870303]'>Bienvenido</h2>
                             </div>
-                            <LoginForm />
+                            <RegisterForm />
                         </div>
                     </div>
                 </div>
@@ -27,4 +27,4 @@ function Login (){
     )
 }
 
-export default Login;
+export default Register;

@@ -151,6 +151,19 @@ const LoginForm = () => {
               )}
             </button>
           </div>
+
+          <div className="form-control mt-4 text-center">
+            <p className="text-sm font-gotham text-[#870303]">
+              ¿No tienes una cuenta?{' '}
+              <a 
+                href="/register" 
+                className="link link-hover text-black"
+                tabIndex={isLoading ? -1 : 0}
+              >
+                Regístrate
+              </a>
+            </p>
+          </div>
         </form>
       </div>
 
